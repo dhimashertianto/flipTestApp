@@ -1,44 +1,20 @@
-import {useState, useEffect} from 'react';
-import axios from 'axios';
-
-interface Transaction {
-  id: string;
-  amount: number;
-  unique_code: number;
-  status: string;
-  sender_bank: string;
-  account_number: string;
-  beneficiary_name: string;
-  beneficiary_bank: string;
-  remark: string;
-  created_at: string;
-  completed_at: string;
-  fee: number;
-}
+import {useDispatch, useSelector} from 'react-redux';
+import {useEffect} from 'react';
+import {RootState, AppDispatch} from '../redux/store';
+import {fetchTransactions} from '../redux/transactions/transactionsAPI';
 
 const useTransactions = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const {transactions, loading, error} = useSelector(
+    (state: RootState) => state.transactions,
+  );
 
   useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        const response = await axios.get(
-          'https://recruitment-test.flip.id/frontend-test',
-        );
-        console.log('response di hit');
-
-        setTransactions(response.data);
-      } catch (err) {
-        setError('Failed to load data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTransactions();
-  }, []);
+    if (transactions.length === 0) {
+      dispatch(fetchTransactions()); // Dispatching the async thunk action
+    }
+  }, [dispatch, transactions.length]);
 
   return {transactions, loading, error};
 };

@@ -19,11 +19,10 @@ const TransactionDetailPage = ({route, navigation}: any) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>{transaction.name}</Text>
-      <Text>Sender Bank: {transaction.senderBank}</Text>
-      <Text>Beneficiary Bank: {transaction.beneficiaryBank}</Text>
+      <Text>Sender Bank: {transaction.sender_bank}</Text>
+      <Text>Beneficiary Bank: {transaction.beneficiary_bank}</Text>
       <Text>Amount: {transaction.amount}</Text>
-      <Text>Date: {new Date(transaction.date).toLocaleDateString()}</Text>
+      <Text>Date: {new Date(transaction.created_at).toLocaleDateString()}</Text>
       <Button title="Back" onPress={() => navigation.goBack()} />
     </View>
   );

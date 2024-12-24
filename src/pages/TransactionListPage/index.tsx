@@ -19,13 +19,25 @@ const TransactionListPage = ({navigation}: any) => {
     if (!transactions) return [];
 
     const transactionsArray = Object.values(transactions);
+
+    // If search term is provided, filter by multiple fields
     if (search) {
-      return transactionsArray.filter(transaction =>
-        transaction.beneficiary_name
-          .toLowerCase()
-          .includes(search.toLowerCase()),
-      );
+      return transactionsArray.filter(transaction => {
+        const lowerCaseSearch = search.toLowerCase();
+
+        return (
+          transaction.beneficiary_name
+            .toLowerCase()
+            .includes(lowerCaseSearch) ||
+          transaction.sender_bank.toLowerCase().includes(lowerCaseSearch) ||
+          transaction.beneficiary_bank
+            .toLowerCase()
+            .includes(lowerCaseSearch) ||
+          transaction.amount.toString().includes(lowerCaseSearch)
+        );
+      });
     }
+
     return transactionsArray;
   }, [transactions, search]);
 
