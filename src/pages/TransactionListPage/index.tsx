@@ -1,30 +1,44 @@
-import React, {useState, useMemo} from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  FlatList,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import React, {useMemo, useState} from 'react';
+import {StyleSheet, Text, View} from 'react-native';
+import SortModal from '../../components/Modal';
+import SearchBar from '../../components/Searchbar';
 import useTransactions from '../../hooks/useTransactions';
-import TransactionItem from '../../components/TransactionItem';
+import TransactionList from '../../components/TransactionList/TransactionList';
+import styles from './TransactionListPage.syles';
+
+/**
+ * A page component that displays a list of transactions with search and sort functionalities.
+ *
+ * This component fetches transactions using the `useTransactions` hook and allows users to search
+ * transactions by beneficiary name, sender bank, beneficiary bank, or amount. It also provides
+ * sorting options by date or beneficiary name.
+ *
+ * @param {{navigation: any}} props - The navigation prop used to navigate between screens.
+ *
+ * The component renders a search bar, a transaction list, and a sort modal. The list of transactions
+ * is filtered based on the search input and sorted based on the selected criteria.
+ *
+ * - `handleTransactionPress`: Navigates to the TransactionDetail page when a transaction is selected.
+ * - `handleSort`: Sets the sort criteria and order for the transactions.
+ *
+ * Displays loading and error messages based on the state of the transaction fetching process.
+ */
 
 const TransactionListPage = ({navigation}: any) => {
   const {transactions, loading, error} = useTransactions();
   const [search, setSearch] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [sortBy, setSortBy] = useState<'date' | 'beneficiary_name' | null>(
+    null,
+  );
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-  // Memoize filtered transactions to avoid recalculating on every render
-  const filteredTransactions = useMemo(() => {
+  const filteredAndSortedTransactions = useMemo(() => {
     if (!transactions) return [];
 
-    const transactionsArray = Object.values(transactions);
-
-    // If search term is provided, filter by multiple fields
-    if (search) {
-      return transactionsArray.filter(transaction => {
-        const lowerCaseSearch = search.toLowerCase();
-
+    const lowerCaseSearch = search.toLowerCase();
+    const transactionsArray = Object.values(transactions).filter(
+      transaction => {
         return (
           transaction.beneficiary_name
             .toLowerCase()
@@ -35,91 +49,63 @@ const TransactionListPage = ({navigation}: any) => {
             .includes(lowerCaseSearch) ||
           transaction.amount.toString().includes(lowerCaseSearch)
         );
-      });
-    }
+      },
+    );
 
-    return transactionsArray;
-  }, [transactions, search]);
+    return transactionsArray.sort((a, b) => {
+      if (sortBy === 'date') {
+        const dateA = new Date(a.created_at).getTime();
+        const dateB = new Date(b.created_at).getTime();
+        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+      }
+      if (sortBy === 'beneficiary_name') {
+        const nameA = a.beneficiary_name.toLowerCase();
+        const nameB = b.beneficiary_name.toLowerCase();
+        return sortOrder === 'asc'
+          ? nameA.localeCompare(nameB)
+          : nameB.localeCompare(nameA);
+      }
+      return 0;
+    });
+  }, [transactions, search, sortBy, sortOrder]);
 
   const handleTransactionPress = (transactionId: string) => {
     navigation.navigate('TransactionDetail', {transactionId});
   };
 
-  const handleClearSearch = () => {
-    setSearch('');
+  const handleSort = (
+    type: 'date' | 'beneficiary_name',
+    order: 'asc' | 'desc',
+  ) => {
+    setSortBy(type);
+    setSortOrder(order);
+    setModalVisible(false);
   };
 
   if (loading) return <Text>Loading...</Text>;
   if (error) return <Text>{error}</Text>;
 
-  const renderEmptyState = () => (
-    <View style={styles.container}>
-      <Text>{search ? 'Not found' : 'No transactions'}</Text>
-    </View>
-  );
-
   return (
-    <View style={styles.container}>
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search Transactions"
-          value={search}
-          onChangeText={setSearch}
-        />
-        <TouchableOpacity
-          onPress={handleClearSearch}
-          style={styles.clearButton}>
-          <Text style={styles.clearButtonText}>clear</Text>
-        </TouchableOpacity>
-      </View>
-      {filteredTransactions.length === 0 ? (
-        renderEmptyState()
-      ) : (
-        <FlatList
-          data={filteredTransactions}
-          renderItem={({item}) => (
-            <TransactionItem
-              transaction={item}
-              onPress={() => handleTransactionPress(item.id)}
-            />
-          )}
-          keyExtractor={item => item.id}
-          windowSize={5}
-        />
-      )}
+    <View style={styles.container()}>
+      <SearchBar
+        search={search}
+        setSearch={setSearch}
+        setModalVisible={setModalVisible}
+      />
+      <TransactionList
+        transactions={filteredAndSortedTransactions}
+        onTransactionPress={handleTransactionPress}
+      />
+      <SortModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        handleSortByDate={order => handleSort('date', order)}
+        handleSortByBeneficiaryName={order =>
+          handleSort('beneficiary_name', order)
+        }
+      />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  searchInput: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    flex: 1,
-    paddingHorizontal: 8,
-  },
-  clearButton: {
-    marginLeft: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 40,
-    width: 40,
-  },
-  clearButtonText: {
-    fontSize: 18,
-    color: 'gray',
-  },
-});
 
 export default TransactionListPage;

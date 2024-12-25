@@ -1,0 +1,4 @@
+export const STATUS_MESSAGE = {
+  SUCCESS: 'SUCCESS',
+  PENDING: 'PENDING',
+};

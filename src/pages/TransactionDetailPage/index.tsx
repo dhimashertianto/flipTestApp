@@ -1,20 +1,27 @@
-import React from 'react';
-import {View, Text, Button, StyleSheet} from 'react-native';
+import React, {useMemo} from 'react';
+import {Button, StyleSheet, Text, View} from 'react-native';
 import useTransactions from '../../hooks/useTransactions';
 
+/**
+ * A page that displays the details of a transaction.
+ *
+ * This page is rendered when the user navigates to `/transaction/:id`.
+ * It shows the sender bank, beneficiary bank, amount, and date of the transaction.
+ * If the transaction is not found, it shows "Transaction not found."
+ *
+ * @param {{route: {params: {transactionId: string}}, navigation: any}} props
+ *   The route and navigation props.
+ *
+ * @returns A React component that displays the transaction details.
+ */
 const TransactionDetailPage = ({route, navigation}: any) => {
   const {transactionId} = route.params;
-  const {transactions, loading, error} = useTransactions();
-  // const transaction = transactions.find(t => t.id === transactionId);
-  // Assuming you have the transactions object and you want to find a transaction by its ID
-  const transaction = transactions[transactionId];
+  const {transactions} = useTransactions();
+  const transaction = useMemo(
+    () => transactions[transactionId],
+    [transactions, transactionId],
+  );
 
-  // console.log('transactionId', transactionId);
-  // console.log('transaction', transaction);
-  // console.log('transaction all', transactions);
-
-  if (loading) return <Text>Loading...</Text>;
-  if (error) return <Text>{error}</Text>;
   if (!transaction) return <Text>Transaction not found.</Text>;
 
   return (
@@ -23,7 +30,7 @@ const TransactionDetailPage = ({route, navigation}: any) => {
       <Text>Beneficiary Bank: {transaction.beneficiary_bank}</Text>
       <Text>Amount: {transaction.amount}</Text>
       <Text>Date: {new Date(transaction.created_at).toLocaleDateString()}</Text>
-      <Button title="Back" onPress={() => navigation.goBack()} />
+      <Button title="Back" onPress={navigation.goBack} />
     </View>
   );
 };

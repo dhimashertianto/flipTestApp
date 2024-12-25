@@ -1,4 +1,4 @@
-export interface Transaction {
+export type Transaction = {
   id: string;
   amount: number;
   unique_code: number;
@@ -11,4 +11,8 @@ export interface Transaction {
   created_at: string;
   completed_at: string;
   fee: number;
-}
+};
+
+export type TransactionError = {
+  message: string;
+};

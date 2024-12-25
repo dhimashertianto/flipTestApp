@@ -1,69 +1,122 @@
-import React from 'react';
-import {View, Text, StyleSheet, Pressable} from 'react-native';
+import React, {useCallback, useMemo} from 'react';
+import {Pressable, Text, View} from 'react-native';
 import {Transaction} from '../../types/Transaction';
+import {STATUS_MESSAGE} from '../../utils/constants';
+import {
+  convertToCapitalCase,
+  formatDate,
+  formatToRupiah,
+} from '../../utils/helper';
+import styles from './TransactionItem.style';
 
 interface TransactionItemProps {
   transaction: Transaction;
   onPress: () => void;
+  color?: string;
 }
 
-const TransactionItem: React.FC<TransactionItemProps> = ({
-  transaction,
-  onPress,
+/**
+ * A component that displays the transaction information.
+ *
+ * @param {string} sender_bank - The sender's bank name.
+ * @param {string} beneficiary_bank - The beneficiary's bank name.
+ * @param {string} beneficiary_name - The beneficiary's name.
+ * @param {number} amount - The transaction amount.
+ * @param {string} created_at - The transaction creation date in ISO 8601 format.
+ *
+ * @returns A React component that displays the transaction information.
+ */
+const TransactionInfo: React.FC<{
+  sender_bank: string;
+  beneficiary_bank: string;
+  beneficiary_name: string;
+  amount: number;
+  created_at: string;
+}> = ({
+  sender_bank,
+  beneficiary_bank,
+  beneficiary_name,
+  amount,
+  created_at,
 }) => {
+  const bankInfo = useMemo(
+    () =>
+      `${convertToCapitalCase(sender_bank)} -> ${convertToCapitalCase(
+        beneficiary_bank,
+      )}`,
+    [sender_bank, beneficiary_bank],
+  );
+
   return (
-    <Pressable style={styles.itemContainer} onPress={onPress}>
-      {/* Left Color Indicator */}
-      <View style={styles.colorContainer} />
-
-      {/* Transaction Details */}
-      <View style={styles.detailsContainer}>
-        <Text style={styles.itemText}>
-          {`${transaction.sender_bank} -> ${transaction.beneficiary_bank}`}
-        </Text>
-        <Text style={styles.itemText}>{transaction.beneficiary_name}</Text>
-        <Text style={styles.itemText}>
-          Rp {transaction.amount} | {transaction.created_at}
-        </Text>
+    <React.Fragment>
+      <View style={styles.detailsContainer()}>
+        <Text style={styles.itemTitle()}>{bankInfo}</Text>
+        <Text style={styles.itemText()}>{beneficiary_name.toUpperCase()}</Text>
+        <TransactionDetails amount={amount} created_at={created_at} />
       </View>
-
-      {/* Status Section */}
-      <View style={styles.statusContainer}>
-        <Text style={styles.itemText}>{transaction.status}</Text>
-      </View>
-    </Pressable>
+    </React.Fragment>
   );
 };
 
-const styles = StyleSheet.create({
-  itemContainer: {
-    marginBottom: 8,
-    borderBottomWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 12,
-    flexDirection: 'row',
-    backgroundColor: 'white', // Set background color to white
-    padding: 8, // Add padding around the entire item
-    alignItems: 'center',
+const TransactionDetails: React.FC<{amount: number; created_at: string}> = ({
+  amount,
+  created_at,
+}) => {
+  const amountFormatted = formatToRupiah(amount);
+  const dateFormatted = formatDate(created_at);
+
+  return (
+    <Text style={styles.itemText()}>
+      {amountFormatted} | {dateFormatted}
+    </Text>
+  );
+};
+
+const TransactionStatus: React.FC<{status: string}> = ({status}) => {
+  const statusText = useMemo(() => {
+    return status === STATUS_MESSAGE.PENDING ? 'Pengecekan' : 'Berhasil';
+  }, [status]);
+
+  return (
+    <View style={styles.statusContainer({status})}>
+      <Text style={styles.itemTextButton({status})}>{statusText}</Text>
+    </View>
+  );
+};
+
+const TransactionItem: React.FC<TransactionItemProps> = React.memo(
+  ({transaction, onPress, color}) => {
+    const {
+      status,
+      sender_bank,
+      beneficiary_bank,
+      beneficiary_name,
+      amount,
+      created_at,
+    } = transaction;
+
+    // Memoize style for colorContainer
+    const colorStyle = useMemo(() => styles.colorContainer({color}), [color]);
+
+    // Memoize the onPress function
+    const handlePress = useCallback(() => {
+      onPress();
+    }, [onPress]);
+
+    return (
+      <Pressable style={styles.itemContainer()} onPress={handlePress}>
+        <View style={colorStyle} />
+        <TransactionInfo
+          sender_bank={sender_bank}
+          beneficiary_bank={beneficiary_bank}
+          beneficiary_name={beneficiary_name}
+          amount={amount}
+          created_at={created_at}
+        />
+        <TransactionStatus status={status} />
+      </Pressable>
+    );
   },
-  colorContainer: {
-    width: 8,
-    backgroundColor: 'blue', // Example color for the left indicator (can be dynamic)
-    height: '100%', // Fill the full height of the container
-  },
-  detailsContainer: {
-    flex: 1, // This section takes up the remaining space
-    paddingLeft: 16, // Padding for the transaction details
-  },
-  statusContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingRight: 16, // Padding for the status container
-  },
-  itemText: {
-    fontSize: 16,
-    color: 'black',
-  },
-});
+);
 
 export default TransactionItem;
