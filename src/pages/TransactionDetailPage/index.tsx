@@ -13,6 +13,7 @@ import TransactionDetailSection from '../../components/TransactionDetail/Transac
 import TransactionTimestamp from '../../components/TransactionDetail/TransactionTimestamp/index.tsx';
 import TransactionHeader from '../../components/TransactionDetail/TransactionHeader/index.tsx';
 import TransactionSubHeader from '../../components/TransactionDetail/TransactionSubheader/index.tsx';
+import styles from './TransactionDetailPage.style.tsx';
 
 /**
  * A page that displays the details of a transaction.
@@ -31,7 +32,7 @@ const TransactionDetailPage = ({route, navigation}: any) => {
   );
 
   if (!transaction)
-    return <Text style={styles.text}>Transaction not found.</Text>;
+    return <Text style={styles.text()}>Transaction not found.</Text>;
 
   const {
     sender_bank,
@@ -50,7 +51,7 @@ const TransactionDetailPage = ({route, navigation}: any) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container()}>
       <TransactionHeader
         transactionId={transactionId}
         onCopy={copyToClipboard}
@@ -73,57 +74,5 @@ const TransactionDetailPage = ({route, navigation}: any) => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  header: {
-    padding: 16,
-    borderBottomColor: 'lightblue',
-    borderBottomWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  subHeader: {
-    padding: 16,
-    borderBottomColor: 'lightblue',
-    borderBottomWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  titleHeader: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  titleButton: {
-    color: 'orange',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  content: {
-    padding: 16,
-  },
-  contentRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  transactionInfo: {
-    flex: 2,
-  },
-  transactionAmount: {
-    flex: 1,
-  },
-  marginBottom: {
-    marginBottom: 16,
-  },
-  text: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginTop: 20,
-  },
-});
 
 export default TransactionDetailPage;

@@ -18,45 +18,33 @@ const TransactionListPage = ({navigation}: any) => {
   );
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-  // Log the modal visibility for debugging
-  useEffect(() => {
-    console.log('Modal visibility:', modalVisible);
-  }, [modalVisible]);
+  useEffect(() => {}, [modalVisible]);
 
   const filteredAndSortedTransactions = useMemo(() => {
     if (!transactions) return [];
 
     const lowerCaseSearch = search.toLowerCase();
-    const transactionsArray = Object.values(transactions).filter(
-      transaction => {
-        return (
-          transaction.beneficiary_name
-            .toLowerCase()
-            .includes(lowerCaseSearch) ||
-          transaction.sender_bank.toLowerCase().includes(lowerCaseSearch) ||
-          transaction.beneficiary_bank
-            .toLowerCase()
-            .includes(lowerCaseSearch) ||
-          transaction.amount.toString().includes(lowerCaseSearch)
-        );
-      },
-    );
-
-    return transactionsArray.sort((a, b) => {
-      if (sortBy === 'date') {
-        const dateA = new Date(a.created_at).getTime();
-        const dateB = new Date(b.created_at).getTime();
-        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-      }
-      if (sortBy === 'beneficiary_name') {
-        const nameA = a.beneficiary_name.toLowerCase();
-        const nameB = b.beneficiary_name.toLowerCase();
-        return sortOrder === 'asc'
-          ? nameA.localeCompare(nameB)
-          : nameB.localeCompare(nameA);
-      }
-      return 0;
+    const transactionsArray = Object.values(transactions);
+    const filteredTransactions = transactionsArray.filter(transaction => {
+      const lowerCaseTransaction = JSON.stringify(transaction).toLowerCase();
+      return lowerCaseTransaction.includes(lowerCaseSearch);
     });
+
+    const sortedTransactions =
+      sortBy === null
+        ? filteredTransactions
+        : filteredTransactions.sort((a, b) => {
+            const valueA =
+              sortBy === 'date' ? a.created_at : a.beneficiary_name;
+            const valueB =
+              sortBy === 'date' ? b.created_at : b.beneficiary_name;
+
+            return sortOrder === 'asc'
+              ? valueA.localeCompare(valueB)
+              : valueB.localeCompare(valueA);
+          });
+
+    return sortedTransactions;
   }, [transactions, search, sortBy, sortOrder]);
 
   const handleTransactionPress = (transactionId: string) => {
@@ -67,10 +55,9 @@ const TransactionListPage = ({navigation}: any) => {
     type: 'date' | 'beneficiary_name',
     order: 'asc' | 'desc',
   ) => {
-    console.log('Setting sort order for', type, order);
     setSortBy(type);
     setSortOrder(order);
-    setModalVisible(false); // Close the modal after sorting
+    setModalVisible(false);
   };
 
   if (loading) return <Text>Loading...</Text>;

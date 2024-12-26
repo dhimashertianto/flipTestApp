@@ -4,14 +4,14 @@ import {STATUS_MESSAGE} from '../../../utils/constants';
 import {Styles} from './TransactionItem.types';
 
 const styles: Styles = {
-  itemContainer: memoize(() => ({
+  itemContainer: memoize((props?: {color?: string}) => ({
     marginBottom: 8,
     borderBottomWidth: 1,
     borderColor: '#ddd',
     borderRadius: 12,
     flexDirection: 'row',
-    backgroundColor: 'white',
-    padding: 12,
+    backgroundColor: props?.color || 'white',
+    paddingLeft: 12,
     alignItems: 'center',
   })),
   colorContainer: memoize((props?: {color?: string}) => ({
@@ -21,14 +21,19 @@ const styles: Styles = {
   })),
   detailsContainer: memoize(() => ({
     flex: 1,
-    paddingLeft: 16,
+    padding: 16,
+    backgroundColor: 'white',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
   })),
   statusContainer: memoize((props?: {status?: string}) =>
     props?.status === STATUS_MESSAGE.SUCCESS
       ? {
           justifyContent: 'center',
           alignItems: 'center',
-          borderRadius: 10,
+          borderRadius: 12,
           backgroundColor: 'green',
           paddingVertical: 8,
           paddingHorizontal: 15,
@@ -38,7 +43,7 @@ const styles: Styles = {
           justifyContent: 'center',
           alignItems: 'center',
           borderWidth: 2,
-          borderRadius: 8,
+          borderRadius: 12,
           paddingVertical: 8,
           paddingHorizontal: 15,
           borderColor: 'orange',
@@ -57,6 +62,9 @@ const styles: Styles = {
   itemTitle: memoize(() => ({
     fontWeight: 'bold',
     fontSize: 16,
+  })),
+  buttonContainer: memoize(() => ({
+    justifyContent: 'center',
   })),
 };
 
