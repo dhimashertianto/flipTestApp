@@ -1,12 +1,12 @@
 import React, {useCallback, useMemo} from 'react';
 import {Pressable, Text, View} from 'react-native';
-import {Transaction} from '../../types/Transaction';
-import {STATUS_MESSAGE} from '../../utils/constants';
+import {Transaction} from '../../../types/Transaction';
+import {STATUS_MESSAGE} from '../../../utils/constants';
 import {
   convertToCapitalCase,
   formatDate,
   formatToRupiah,
-} from '../../utils/helper';
+} from '../../../utils/helper';
 import styles from './TransactionItem.style';
 
 interface TransactionItemProps {

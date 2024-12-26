@@ -1,29 +1,14 @@
-import React, {useMemo, useState} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
-import SortModal from '../../components/Modal';
-import SearchBar from '../../components/Searchbar';
+import React, {useMemo, useState, useEffect} from 'react';
+import {SafeAreaView, Text, View} from 'react-native';
+import SortModal from '../../components/Transaction/Modal';
+import SearchBar from '../../components/Transaction/Searchbar';
 import useTransactions from '../../hooks/useTransactions';
-import TransactionList from '../../components/TransactionList/TransactionList';
+import TransactionList from '../../components/TransactionDetail/TransactionList/TransactionList';
 import styles from './TransactionListPage.syles';
 
 /**
  * A page component that displays a list of transactions with search and sort functionalities.
- *
- * This component fetches transactions using the `useTransactions` hook and allows users to search
- * transactions by beneficiary name, sender bank, beneficiary bank, or amount. It also provides
- * sorting options by date or beneficiary name.
- *
- * @param {{navigation: any}} props - The navigation prop used to navigate between screens.
- *
- * The component renders a search bar, a transaction list, and a sort modal. The list of transactions
- * is filtered based on the search input and sorted based on the selected criteria.
- *
- * - `handleTransactionPress`: Navigates to the TransactionDetail page when a transaction is selected.
- * - `handleSort`: Sets the sort criteria and order for the transactions.
- *
- * Displays loading and error messages based on the state of the transaction fetching process.
  */
-
 const TransactionListPage = ({navigation}: any) => {
   const {transactions, loading, error} = useTransactions();
   const [search, setSearch] = useState('');
@@ -32,6 +17,11 @@ const TransactionListPage = ({navigation}: any) => {
     null,
   );
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+
+  // Log the modal visibility for debugging
+  useEffect(() => {
+    console.log('Modal visibility:', modalVisible);
+  }, [modalVisible]);
 
   const filteredAndSortedTransactions = useMemo(() => {
     if (!transactions) return [];
@@ -77,16 +67,17 @@ const TransactionListPage = ({navigation}: any) => {
     type: 'date' | 'beneficiary_name',
     order: 'asc' | 'desc',
   ) => {
+    console.log('Setting sort order for', type, order);
     setSortBy(type);
     setSortOrder(order);
-    setModalVisible(false);
+    setModalVisible(false); // Close the modal after sorting
   };
 
   if (loading) return <Text>Loading...</Text>;
   if (error) return <Text>{error}</Text>;
 
   return (
-    <View style={styles.container()}>
+    <SafeAreaView style={styles.container()}>
       <SearchBar
         search={search}
         setSearch={setSearch}
@@ -104,7 +95,7 @@ const TransactionListPage = ({navigation}: any) => {
           handleSort('beneficiary_name', order)
         }
       />
-    </View>
+    </SafeAreaView>
   );
 };
 

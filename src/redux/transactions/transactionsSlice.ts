@@ -6,12 +6,14 @@ interface TransactionsState {
   transactions: Transaction[];
   loading: boolean;
   error: string | null;
+  lastFetched: number | null;
 }
 
 const initialState: TransactionsState = {
   transactions: [],
   loading: false,
   error: null,
+  lastFetched: null,
 };
 
 const transactionsSlice = createSlice({

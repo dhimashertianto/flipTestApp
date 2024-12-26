@@ -15,12 +15,12 @@ const App = () => {
         <Stack.Screen
           name="TransactionList"
           component={TransactionListPage}
-          options={{title: 'Transaction List'}}
+          options={{title: 'Transaction List', headerShown: false}}
         />
         <Stack.Screen
           name="TransactionDetail"
           component={TransactionDetailPage}
-          options={{title: 'Transaction Detail'}}
+          options={{title: 'Transaction Detail', headerShown: false}}
         />
       </Stack.Navigator>
     </NavigationContainer>

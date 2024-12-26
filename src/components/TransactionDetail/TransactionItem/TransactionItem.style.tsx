@@ -1,6 +1,6 @@
 import memoize from 'fast-memoize';
 
-import {STATUS_MESSAGE} from '../../utils/constants';
+import {STATUS_MESSAGE} from '../../../utils/constants';
 import {Styles} from './TransactionItem.types';
 
 const styles: Styles = {
@@ -11,8 +11,7 @@ const styles: Styles = {
     borderRadius: 12,
     flexDirection: 'row',
     backgroundColor: 'white',
-    paddingHorizontal: 8,
-    paddingVertical: 12,
+    padding: 12,
     alignItems: 'center',
   })),
   colorContainer: memoize((props?: {color?: string}) => ({

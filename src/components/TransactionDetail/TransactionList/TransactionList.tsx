@@ -1,7 +1,7 @@
 import React from 'react';
 import {FlatList, Text, View} from 'react-native';
 import TransactionItem from '../TransactionItem';
-import {STATUS_MESSAGE} from '../../utils/constants';
+import {STATUS_MESSAGE} from '../../../utils/constants';
 
 type TransactionListProps = {
   transactions: any[];
@@ -48,6 +48,7 @@ const TransactionList: React.FC<TransactionListProps> = ({
 
   return (
     <FlatList
+      style={{paddingHorizontal: 16}}
       data={transactions}
       renderItem={renderItem}
       keyExtractor={item => item.id}

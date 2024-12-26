@@ -8,6 +8,7 @@ const styles: Styles = {
     alignItems: 'center',
     marginBottom: 16,
     justifyContent: 'space-between',
+    paddingHorizontal: 16,
   })),
   searchInput: memoize(() => ({
     height: 40,

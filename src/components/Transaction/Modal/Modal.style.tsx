@@ -19,6 +19,24 @@ const styles: Styles = {
     fontWeight: 'bold',
     marginBottom: 15,
   })),
+  optionContainer: memoize(() => ({
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 10,
+  })),
+  optionText: memoize(() => ({
+    fontSize: 16,
+    marginLeft: 10,
+  })),
+  applyButton: memoize(() => ({
+    backgroundColor: 'green',
+    padding: 10,
+    borderRadius: 5,
+  })),
+  applyButtonText: memoize(() => ({
+    color: 'white',
+    fontWeight: 'bold',
+  })),
 };
 
 export default styles;

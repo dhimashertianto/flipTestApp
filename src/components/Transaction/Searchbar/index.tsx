@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {Pressable, Text, TextInput, View} from 'react-native';
 import styles from './SearchBar.style';
 
 type SearchBarProps = {
@@ -20,11 +20,11 @@ const SearchBar = React.memo<SearchBarProps>(
         autoCorrect={false}
         spellCheck={false}
       />
-      <TouchableOpacity
-        onPress={setModalVisible.bind(null, true)}
+      <Pressable
+        onPress={() => setModalVisible(true)} // Trigger modal visibility
         style={styles.clearButton()}>
         <Text style={styles.clearButtonText()}>Urutkan</Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   ),
 );
